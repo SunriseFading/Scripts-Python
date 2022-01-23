@@ -59,6 +59,3 @@ except KeyboardInterrupt:
     print("\n[-] Detected Ctrl+C .... Resetting ARP-tables.\n")
     restore(target_ip, gateway_ip)
     restore(gateway_ip, target_ip)
-
-    restore(target_ip, gateway_ip)
-    restore(gateway_ip, target_ip)
